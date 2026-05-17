@@ -1,0 +1,10 @@
+{
+  "_format": "hh-sol-artifact-1",
+  "contractName": "Impl",
+  "sourceName": "@fhenixprotocol/cofhe-contracts/FHE.sol",
+  "abi": [],
+  "bytecode": "0x6080806040523460175760399081601c823930815050f35b5f80fdfe5f80fdfea2646970667358221220f6337fd04638affe76357ff527642b112cd530cee1a96a3df4095eb78e3379ca64736f6c63430008190033",
+  "deployedBytecode": "0x5f80fdfea2646970667358221220f6337fd04638affe76357ff527642b112cd530cee1a96a3df4095eb78e3379ca64736f6c63430008190033",
+  "linkReferences": {},
+  "deployedLinkReferences": {}
+}
