@@ -14,6 +14,51 @@ The app supports three main users:
 - Lenders create score-gated pools, set collateral and interest terms, fund liquidity, pause pools, withdraw available liquidity, and monitor pool risk.
 - Integrators can verify score attestations to check whether a wallet met a score threshold without needing the borrower's full profile.
 
+## Why It Matters
+
+Traditional DeFi lending treats nearly every borrower the same: bring enough collateral or do not borrow. ShieldScore adds a privacy-preserving trust layer so lenders can price risk using verified credit behavior without asking borrowers to reveal raw balances, income assumptions, or repayment history in public.
+
+The project is built for testnet lending demos, credit attestations, and partner integrations that need a composable score check. The current deployment is intentionally on Sepolia because CoFHE support is testnet-focused.
+
+## Architecture
+
+- **Frontend:** Next.js app router with dedicated pages for dashboard, scoring, marketplace, pool creation, repayments, attestations, and lender risk.
+- **On-chain protocol:** `ShieldScoreProtocol.sol` stores encrypted score handles, published scores, loan pools, borrower loans, score history, attestations, and lender analytics.
+- **FHE layer:** CoFHE encrypts wallet-derived score inputs and verifies decrypt-for-transaction signatures before scores become usable on-chain.
+- **Server attester:** `/api/credit-authorization` derives wallet/protocol signals, encrypts them, rate-limits requests, and signs EIP-712 authorizations with `CREDIT_ATTESTER_PRIVATE_KEY`.
+- **Operations:** `/api/health`, keeper scripts, deployment metadata, and runbooks cover the production demo lifecycle.
+
+## User Flows
+
+1. Borrower connects wallet and imports wallet/protocol credit signals.
+2. Server encrypts the five score inputs and signs the encrypted-input bundle.
+3. Borrower submits the encrypted snapshot and publishes the verified score.
+4. Borrower borrows from eligible native ETH or ssUSDC pools.
+5. Borrower repays loans, refreshes score, and can issue threshold attestations.
+6. Lender creates/funds pools, pauses pools, withdraws available liquidity, and monitors default risk.
+
+## Security And Privacy Model
+
+- Raw score inputs are encrypted before reaching the contract.
+- The final score is public after verified decryption; ShieldScore is "private inputs, public verified score."
+- Encrypted snapshot submission requires an EIP-712 authorization from the configured credit attester.
+- ERC-20 pools are restricted to owner-approved asset policies, so arbitrary token/price combinations cannot be created from the frontend.
+- Scores become stale after repayment/default activity or after 30 days, forcing a refresh before new borrowing.
+- The guardian can pause the protocol, while only the owner can unpause.
+
+## Environment Guidance
+
+Only these production env vars are required for the deployed app:
+
+- `NEXT_PUBLIC_SHIELDSCORE_ADDRESS`
+- `NEXT_PUBLIC_SHIELDSCORE_USDC_ADDRESS`
+- `NEXT_PUBLIC_SHIELDSCORE_START_BLOCK`
+- `NEXT_PUBLIC_SHIELDSCORE_CHAIN_ID`
+- `NEXT_PUBLIC_DEFAULT_RPC_URL`
+- `CREDIT_ATTESTER_PRIVATE_KEY`
+
+Pinata and OpenAI keys are not used by the current codebase and should not be added to Vercel for this app.
+
 ## How It Works
 
 1. A borrower connects a wallet and requests five normalized credit signals: balance consistency, repayment history, wallet age, protocol diversity, and income consistency.
@@ -208,4 +253,3 @@ Wave 5 is now implemented as the production-hardening release:
 - The app is wired for Sepolia testnet. Production deployments must set `CREDIT_ATTESTER_PRIVATE_KEY` as a server-only environment variable matching the deployed contract's `creditAttester()`.
 - `npm audit --omit=dev` still reports Hardhat 2 transitive advisories because the latest `@cofhe/sdk` peers into the Hardhat 2 toolchain. Do not force Hardhat 3 without validating CoFHE plugin compatibility.
 - Webpack reports circular chunk warnings from CoFHE SDK bundling; the production build still completes and deploys successfully.
-
