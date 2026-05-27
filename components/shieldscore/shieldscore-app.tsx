@@ -1607,111 +1607,81 @@ export function ShieldScoreApp({ initialTab = "dashboard" }: { initialTab?: Shie
 
       <section className="mx-auto w-full max-w-[1440px] px-4 py-8 sm:px-6 lg:px-10 lg:py-10">
         {activeTab === "dashboard" && (
-          <div className="space-y-8">
+          <div className="space-y-6">
             {deploymentIssue && (
-              <div className="flex flex-col gap-4 border border-amber-500/30 bg-amber-500/10 p-5 text-amber-900 sm:flex-row sm:items-start sm:justify-between">
+              <Panel className="flex flex-col gap-4 border-amber-500/30 bg-amber-500/10 p-4 text-amber-900 sm:flex-row sm:items-start sm:justify-between">
                 <div className="flex gap-3">
                   <CircleAlert className="mt-0.5 h-5 w-5 shrink-0" />
                   <div>
-                    <p className="font-medium">On-chain deployment needs attention</p>
+                    <p className="font-medium">Deployment attention</p>
                     <p className="mt-1 max-w-4xl text-sm leading-relaxed">{deploymentIssue}</p>
                   </div>
                 </div>
                 <a href="/api/health" className="inline-flex shrink-0 items-center gap-2 text-sm font-medium">
                   Health endpoint <ExternalLink className="h-4 w-4" />
                 </a>
-              </div>
+              </Panel>
             )}
-            <div className="grid gap-px overflow-hidden border border-foreground/10 bg-foreground/10 lg:grid-cols-[1.35fr_0.65fr]">
-              <div className="min-w-0 bg-background p-5 sm:p-6 lg:p-8">
-                <div className="flex flex-col gap-6 xl:flex-row xl:items-start xl:justify-between">
-                  <div className="max-w-3xl">
-                    <SectionLabel>Borrower dashboard</SectionLabel>
-                    <h1 className="mt-6 max-w-full break-words font-display text-4xl leading-none sm:text-5xl lg:text-6xl">
-                      Your private credit command center.
-                    </h1>
-                    <p className="mt-5 max-w-2xl text-base leading-relaxed text-muted-foreground lg:text-lg">
-                      Track your encrypted score, pool eligibility, repayment health, and recent on-chain activity from one clean workspace.
-                    </p>
-                  </div>
-                  <div className="w-full border border-foreground/10 p-4 xl:w-72">
-                    <div className="flex items-center justify-between gap-3">
-                      <DashboardBadge tone={dashboardStatusTone}>
-                        <span className={cn("h-2 w-2 rounded-full", busy || scoreStale ? "bg-amber-600" : effectiveScore ? "bg-emerald-600" : "bg-foreground/40")} />
-                        {dashboardStatusLabel}
-                      </DashboardBadge>
-                      <Activity className={cn("h-4 w-4 text-muted-foreground", busy && "animate-pulse")} />
-                    </div>
-                    <div className="mt-5 text-sm">
-                      <p className="font-medium">{account ? shorten(account) : "Wallet not connected"}</p>
-                      <p className="mt-1 text-xs font-mono text-muted-foreground">Chain {chainId || SHIELDSCORE_CHAIN_ID}</p>
-                    </div>
-                  </div>
-                </div>
+            <PageHeader
+              label="Dashboard"
+              title="Credit workspace"
+              detail="Score, eligibility, loans, and on-chain activity in one calm view."
+              actions={
+                <DashboardBadge tone={dashboardStatusTone}>
+                  <span className={cn("h-2 w-2 rounded-full", busy || scoreStale ? "bg-amber-600" : effectiveScore ? "bg-emerald-600" : "bg-foreground/40")} />
+                  {dashboardStatusLabel}
+                </DashboardBadge>
+              }
+            />
 
-                <div className="mt-8 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-                  <DashboardMetric
-                    icon={ShieldCheck}
-                    label="Published score"
-                    value={effectiveScore || "Not live"}
-                    detail={effectiveScore ? `${scoreTier} tier, last update ${latestScoreEntry ? formatTime(latestScoreEntry.publishedAt) : formatTime(profile.scorePublishedAt)}` : "Generate an encrypted snapshot to publish a score."}
-                  />
-                  <DashboardMetric
-                    icon={Landmark}
-                    label="Eligible pools"
-                    value={`${qualifiedPools.length}/${activePoolCount}`}
-                    detail={activePoolCount ? "Active marketplace pools matching your current score." : "No active marketplace pools are loaded yet."}
-                  />
-                  <DashboardMetric
-                    icon={Banknote}
-                    label="Active loans"
-                    value={activeLoans.length}
-                    detail={selectedLoanPool ? `Next pool: ${assetSymbol(selectedLoanPool)} due ${selectedLoan ? formatTime(selectedLoan.dueTime) : "n/a"}` : "No open repayment obligations."}
-                  />
-                  <DashboardMetric
-                    icon={BadgeCheck}
-                    label="Repayment health"
-                    value={repaymentTotal ? `${repaymentRate}%` : "Clean"}
-                    detail={repaymentTotal ? `${profile.loansRepaid} on-time, ${profile.loansRepaidLate} late, ${profile.loansDefaulted} defaulted.` : "No completed loans recorded for this wallet."}
-                  />
-                </div>
+            <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+              <DashboardMetric
+                icon={ShieldCheck}
+                label="Published score"
+                value={effectiveScore || "Not live"}
+                detail={effectiveScore ? `${scoreTier} tier, updated ${latestScoreEntry ? formatTime(latestScoreEntry.publishedAt) : formatTime(profile.scorePublishedAt)}` : "Generate a private snapshot first."}
+              />
+              <DashboardMetric
+                icon={Landmark}
+                label="Eligible pools"
+                value={`${qualifiedPools.length}/${activePoolCount}`}
+                detail={activePoolCount ? "Live pools matching this wallet." : "No live pools loaded yet."}
+              />
+              <DashboardMetric
+                icon={Banknote}
+                label="Active loans"
+                value={activeLoans.length}
+                detail={selectedLoanPool ? `${assetSymbol(selectedLoanPool)} due ${selectedLoan ? formatTime(selectedLoan.dueTime) : "n/a"}` : "No open loans."}
+              />
+              <DashboardMetric
+                icon={BadgeCheck}
+                label="Repayment health"
+                value={repaymentTotal ? `${repaymentRate}%` : "Clean"}
+                detail={repaymentTotal ? `${profile.loansRepaid} on-time, ${profile.loansRepaidLate} late.` : "No completed loans recorded."}
+              />
+            </div>
 
-                <div className="mt-8 grid gap-6 xl:grid-cols-[0.72fr_1fr]">
-                  <div className="border border-foreground/10 p-5">
+            <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_360px]">
+              <div className="space-y-6">
+                <div className="grid gap-6 lg:grid-cols-[0.82fr_1.18fr]">
+                  <Panel className="p-5">
                     <div className="mb-6 flex items-center justify-between gap-4">
-                      <div>
-                        <span className="font-mono text-xs uppercase text-muted-foreground">Credit readiness</span>
-                        <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
-                          Signals that affect borrowing and verification.
-                        </p>
-                      </div>
+                      <span className="font-mono text-xs uppercase tracking-[0.08em] text-muted-foreground">Readiness</span>
                       <Gauge className="h-5 w-5 text-muted-foreground" />
                     </div>
                     <div className="space-y-6">
-                      <DashboardProgress
-                        label="Score range"
-                        value={scoreProgress}
-                        detail={`${effectiveScore || 0} of 850 based on the current published or projected score.`}
-                      />
-                      <DashboardProgress
-                        label="On-time repayment"
-                        value={repaymentTotal ? repaymentRate : 100}
-                        detail={repaymentTotal ? `${repaymentTotal} closed loan events are included.` : "Starts at full strength until a loan closes."}
-                      />
-                      <DashboardProgress
-                        label="Snapshot coverage"
-                        value={Math.min(100, profile.snapshotsSubmitted * 25)}
-                        detail={`${profile.snapshotsSubmitted} encrypted snapshot${profile.snapshotsSubmitted === 1 ? "" : "s"} submitted.`}
-                      />
+                      <DashboardProgress label="Score range" value={scoreProgress} detail={`${effectiveScore || 0} / 850`} />
+                      <DashboardProgress label="Repayment" value={repaymentTotal ? repaymentRate : 100} detail={repaymentTotal ? `${repaymentTotal} closed events` : "No closed loans yet"} />
+                      <DashboardProgress label="Snapshots" value={Math.min(100, profile.snapshotsSubmitted * 25)} detail={`${profile.snapshotsSubmitted} encrypted snapshot${profile.snapshotsSubmitted === 1 ? "" : "s"}`} />
                     </div>
-                  </div>
+                  </Panel>
 
-                  <div className="border border-foreground/10 p-5">
+                  <Panel className="p-5">
                     <div className="mb-5 flex items-start justify-between gap-4">
                       <div>
-                        <span className="font-mono text-xs uppercase text-muted-foreground">Score history</span>
-                        <p className="mt-2 text-sm text-muted-foreground">
-                          {latestScoreEntry ? `Latest score ${latestScoreEntry.score} on ${formatTime(latestScoreEntry.publishedAt)}.` : "Publish a score to start the timeline."}
+                        <span className="font-mono text-xs uppercase tracking-[0.08em] text-muted-foreground">Score history</span>
+                        <p className="mt-1 text-sm text-muted-foreground">
+                          {latestScoreEntry ? `${latestScoreEntry.score} on ${formatTime(latestScoreEntry.publishedAt)}` : "No published timeline yet."}
                         </p>
                       </div>
                       <History className="h-4 w-4 shrink-0 text-muted-foreground" />
@@ -1722,30 +1692,82 @@ export function ShieldScoreApp({ initialTab = "dashboard" }: { initialTab?: Shie
                           <LineChart data={displayedScoreHistory.map((item) => ({ date: formatTime(item.publishedAt), score: item.score }))}>
                             <CartesianGrid strokeDasharray="3 3" stroke="rgba(0,0,0,0.08)" />
                             <XAxis dataKey="date" tickLine={false} axisLine={false} fontSize={12} />
-                            <YAxis domain={[300, 850]} tickLine={false} axisLine={false} fontSize={12} />
+                            <YAxis domain={[300, 850]} tickLine={false} axisLine={false} fontSize={12} width={36} />
                             <Tooltip />
                             <Line type="monotone" dataKey="score" stroke="currentColor" strokeWidth={2} dot={{ r: 3 }} />
                           </LineChart>
                         </ResponsiveContainer>
                       ) : (
-                        <div className="flex h-full items-center justify-center border border-dashed border-foreground/15 px-6 text-center text-sm leading-relaxed text-muted-foreground">
-                          Score history will appear after the first on-chain score publication.
+                        <div className="flex h-full items-center justify-center rounded-md border border-dashed border-foreground/15 px-6 text-center text-sm leading-relaxed text-muted-foreground">
+                          Publish a score to draw the timeline.
                         </div>
                       )}
                     </div>
-                  </div>
+                  </Panel>
+                </div>
+
+                <div className="grid gap-6 lg:grid-cols-2">
+                  <Panel>
+                    <div className="flex items-center justify-between border-b border-foreground/10 p-5">
+                      <span className="font-mono text-xs uppercase tracking-[0.08em] text-muted-foreground">Activity</span>
+                      <RefreshCw className={cn("h-4 w-4 text-muted-foreground", busy && "animate-spin")} />
+                    </div>
+                    <div className="divide-y divide-foreground/10">
+                      {activityLog.map((item, index) => (
+                        <div key={`${item}-${index}`} className="flex items-start gap-3 p-4">
+                          <span className="mt-1.5 h-2 w-2 shrink-0 rounded-full bg-foreground/55" />
+                          <span className="text-sm leading-relaxed">{item}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </Panel>
+
+                  <Panel>
+                    <div className="flex items-start justify-between gap-4 border-b border-foreground/10 p-5">
+                      <span className="font-mono text-xs uppercase tracking-[0.08em] text-muted-foreground">Transactions</span>
+                      {lastGasEstimate && <span className="shrink-0 text-xs font-mono text-muted-foreground">Gas {lastGasEstimate.toString()}</span>}
+                    </div>
+                    <div className="divide-y divide-foreground/10">
+                      {txHistory.length === 0 && <div className="p-5 text-sm leading-relaxed text-muted-foreground">No wallet transactions in this session.</div>}
+                      {txHistory.map((tx) => (
+                        <a
+                          key={tx.hash}
+                          href={tx.explorerUrl || undefined}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="flex items-center justify-between gap-4 p-4 text-sm transition-colors hover:bg-foreground/[0.03]"
+                        >
+                          <div className="min-w-0">
+                            <p className="truncate font-medium">{tx.label}</p>
+                            <p className="mt-1 truncate font-mono text-xs text-muted-foreground">{shorten(tx.hash)}</p>
+                          </div>
+                          <span
+                            className={cn(
+                              "inline-flex shrink-0 items-center gap-2 rounded-md border px-2.5 py-1 text-xs font-mono uppercase",
+                              tx.status === "confirmed" && "border-emerald-500/25 text-emerald-700",
+                              tx.status === "pending" && "border-amber-500/25 text-amber-700",
+                              tx.status === "failed" && "border-red-500/25 text-red-700"
+                            )}
+                          >
+                            {tx.status}
+                            {tx.explorerUrl && <ExternalLink className="h-3 w-3" />}
+                          </span>
+                        </a>
+                      ))}
+                    </div>
+                  </Panel>
                 </div>
               </div>
 
-              <aside className="bg-background p-5 sm:p-6 lg:p-8">
-                <SectionLabel>Next best action</SectionLabel>
-                <div className="mt-8 border border-foreground/10 p-5">
-                  <div className="flex h-12 w-12 items-center justify-center bg-foreground text-background">
+              <aside className="space-y-6">
+                <Panel className="p-5">
+                  <SectionLabel>Next action</SectionLabel>
+                  <div className="mt-6 flex h-11 w-11 items-center justify-center rounded-md bg-foreground text-background">
                     <DashboardActionIcon className="h-5 w-5" />
                   </div>
-                  <h2 className="mt-6 font-display text-3xl leading-tight">{dashboardAction.label}</h2>
+                  <h2 className="mt-5 font-display text-3xl leading-tight">{dashboardAction.label}</h2>
                   <p className="mt-3 text-sm leading-relaxed text-muted-foreground">{dashboardAction.detail}</p>
-                  <div className="mt-6">
+                  <div className="mt-5">
                     {dashboardAction.href ? (
                       <ActionLink href={dashboardAction.href}>
                         Continue <ArrowRight className="h-4 w-4" />
@@ -1756,11 +1778,11 @@ export function ShieldScoreApp({ initialTab = "dashboard" }: { initialTab?: Shie
                       </ActionButton>
                     )}
                   </div>
-                </div>
+                </Panel>
 
-                <div className="mt-6 divide-y divide-foreground/10 border border-foreground/10">
+                <Panel className="divide-y divide-foreground/10">
                   {[
-                    { label: "Score freshness", value: scoreStale ? "Refresh needed" : effectiveScore ? "Current" : "No score", ok: !scoreStale && Boolean(effectiveScore) },
+                    { label: "Score freshness", value: scoreStale ? "Refresh" : effectiveScore ? "Current" : "No score", ok: !scoreStale && Boolean(effectiveScore) },
                     { label: "Market access", value: `${qualifiedPools.length} eligible`, ok: qualifiedPools.length > 0 },
                     { label: "Repayments", value: activeLoans.length ? `${activeLoans.length} active` : "Clear", ok: activeLoans.length === 0 },
                     { label: "Attestations", value: `${attestations.filter((item) => !item.revoked).length} active`, ok: attestations.some((item) => !item.revoked) },
@@ -1773,70 +1795,8 @@ export function ShieldScoreApp({ initialTab = "dashboard" }: { initialTab?: Shie
                       {item.ok ? <Check className="h-4 w-4 text-emerald-600" /> : <CircleAlert className="h-4 w-4 text-amber-600" />}
                     </div>
                   ))}
-                </div>
+                </Panel>
               </aside>
-            </div>
-
-            <div className="grid gap-6 lg:grid-cols-[0.95fr_1.05fr]">
-              <div className="border border-foreground/10">
-                <div className="flex items-center justify-between border-b border-foreground/10 p-5">
-                  <div>
-                    <span className="font-mono text-xs uppercase text-muted-foreground">Activity feed</span>
-                    <p className="mt-1 text-sm text-muted-foreground">Recent protocol reads and wallet actions.</p>
-                  </div>
-                  <RefreshCw className={cn("h-4 w-4 text-muted-foreground", busy && "animate-spin")} />
-                </div>
-                <div className="divide-y divide-foreground/10">
-                  {activityLog.map((item, index) => (
-                    <div key={`${item}-${index}`} className="flex items-start gap-4 p-5">
-                      <span className="mt-1.5 h-2 w-2 shrink-0 rounded-full bg-foreground" />
-                      <span className="text-sm leading-relaxed">{item}</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              <div className="border border-foreground/10">
-                <div className="flex items-start justify-between gap-4 border-b border-foreground/10 p-5">
-                  <div>
-                    <span className="font-mono text-xs uppercase text-muted-foreground">Transaction history</span>
-                    <p className="mt-1 text-sm text-muted-foreground">Session transactions with explorer links.</p>
-                  </div>
-                  {lastGasEstimate && <span className="shrink-0 text-xs font-mono text-muted-foreground">Gas {lastGasEstimate.toString()}</span>}
-                </div>
-                <div className="divide-y divide-foreground/10">
-                  {txHistory.length === 0 && (
-                    <div className="p-6 text-sm leading-relaxed text-muted-foreground">
-                      No wallet transactions in this session. Submitted score, pool, borrow, repay, and attestation writes will appear here.
-                    </div>
-                  )}
-                  {txHistory.map((tx) => (
-                    <a
-                      key={tx.hash}
-                      href={tx.explorerUrl || undefined}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="flex items-center justify-between gap-4 p-5 text-sm transition-colors hover:bg-foreground/[0.03]"
-                    >
-                      <div className="min-w-0">
-                        <p className="truncate font-medium">{tx.label}</p>
-                        <p className="mt-1 truncate font-mono text-xs text-muted-foreground">{shorten(tx.hash)}</p>
-                      </div>
-                      <span
-                        className={cn(
-                          "inline-flex shrink-0 items-center gap-2 border px-3 py-1 text-xs font-mono uppercase",
-                          tx.status === "confirmed" && "border-emerald-500/25 text-emerald-700",
-                          tx.status === "pending" && "border-amber-500/25 text-amber-700",
-                          tx.status === "failed" && "border-red-500/25 text-red-700"
-                        )}
-                      >
-                        {tx.status}
-                        {tx.explorerUrl && <ExternalLink className="h-3 w-3" />}
-                      </span>
-                    </a>
-                  ))}
-                </div>
-              </div>
             </div>
           </div>
         )}
