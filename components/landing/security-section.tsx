@@ -6,8 +6,8 @@ import { Shield, Lock, Eye, FileCheck } from "lucide-react";
 const securityFeatures = [
   {
     icon: Shield,
-    title: "Client-side encryption",
-    description: "Borrower inputs are encrypted before they leave the browser.",
+    title: "Attested encryption",
+    description: "Wallet signals are encrypted and signed before the score transaction is submitted.",
   },
   {
     icon: Lock,

@@ -6,7 +6,7 @@ const steps = [
   {
     number: "I",
     title: "Encrypt borrower signals",
-    description: "The client encrypts normalized balance, repayment, activity, and consistency inputs before the transaction is signed.",
+    description: "The credit attester derives wallet signals, encrypts them with CoFHE, and signs the input handles before the transaction is sent.",
     code: `const encrypted = await cofhe
   .encryptInputs([
     uint32(balance),

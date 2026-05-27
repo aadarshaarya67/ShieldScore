@@ -6,7 +6,7 @@ const features = [
   {
     number: "01",
     title: "Encrypted Credit Scoring",
-    description: "Financial signals are encrypted in the browser and scored by the CoFHE contract without raw values becoming public.",
+    description: "Wallet signals are encrypted through the trusted CoFHE attester flow and scored by the contract without raw inputs becoming public.",
     visual: "deploy",
   },
   {

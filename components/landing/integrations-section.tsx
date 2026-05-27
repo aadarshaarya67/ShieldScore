@@ -3,7 +3,7 @@
 import { useEffect, useState, useRef } from "react";
 
 const integrations = [
-  { name: "CoFHE SDK", category: "Client encryption" },
+  { name: "CoFHE SDK", category: "Attested encryption" },
   { name: "FHE.sol", category: "Encrypted math" },
   { name: "Arbitrum Sepolia", category: "Testnet" },
   { name: "Ethereum Sepolia", category: "Testnet" },
