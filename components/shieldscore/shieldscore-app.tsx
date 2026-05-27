@@ -1802,17 +1802,171 @@ export function ShieldScoreApp({ initialTab = "dashboard" }: { initialTab?: Shie
         )}
 
         {activeTab === "score" && (
-          <div className="grid gap-12 lg:grid-cols-[0.8fr_1.2fr]">
+          <div className="space-y-6">
+            <PageHeader
+              label="Score"
+              title="Generate verified score"
+              detail="Encrypt wallet signals, publish only the final score."
+              actions={
+                <>
+                  <ActionButton onClick={importWalletData} disabled={busy || !account} variant="outline">
+                    <Search className="h-4 w-4" />
+                    Import
+                  </ActionButton>
+                  <ActionButton onClick={() => generateScore(false)} disabled={busy || (hasContract && (!account || !cofheClient))}>
+                    <KeyRound className="h-4 w-4" />
+                    Publish
+                  </ActionButton>
+                  <ActionButton onClick={() => generateScore(true)} disabled={busy || profile.snapshotsSubmitted === 0 || (hasContract && (!account || !cofheClient))} variant="outline">
+                    <RefreshCw className="h-4 w-4" />
+                    Refresh
+                  </ActionButton>
+                </>
+              }
+            />
+
+            <div className="grid gap-6 lg:grid-cols-[360px_minmax(0,1fr)]">
+              <Panel className="p-5">
+                <span className="text-xs font-mono uppercase tracking-[0.08em] text-muted-foreground">Projected score</span>
+                <div className="mt-4 font-display text-7xl leading-none">{projectedScore}</div>
+                <div className="mt-5 h-2 overflow-hidden rounded-full bg-foreground/10">
+                  <div className="h-full rounded-full bg-foreground" style={{ width: `${Math.max(0, Math.min(100, ((projectedScore - 300) / 550) * 100))}%` }} />
+                </div>
+                <div className="mt-5 grid grid-cols-2 gap-3 text-sm">
+                  <div>
+                    <span className="text-muted-foreground">Published</span>
+                    <p className="mt-1 font-medium">{profile.publicScore || "Not live"}</p>
+                  </div>
+                  <div>
+                    <span className="text-muted-foreground">Snapshots</span>
+                    <p className="mt-1 font-medium">{profile.snapshotsSubmitted}</p>
+                  </div>
+                </div>
+              </Panel>
+
+              <Panel className="p-5">
+                <div className="mb-5 flex items-center justify-between gap-4">
+                  <span className="font-mono text-xs uppercase tracking-[0.08em] text-muted-foreground">Inputs</span>
+                  <Lock className="h-4 w-4 text-muted-foreground" />
+                </div>
+                <div className="space-y-5">
+                  {factors.map((factor) => (
+                    <div key={factor.key}>
+                      <div className="mb-3 flex items-center justify-between gap-4">
+                        <div>
+                          <div className="font-medium">{factor.label}</div>
+                          <div className="text-xs font-mono text-muted-foreground">Weight {factor.weight}</div>
+                        </div>
+                        <span className="font-display text-3xl">{snapshot[factor.key]}</span>
+                      </div>
+                      <input
+                        type="range"
+                        min="0"
+                        max="100"
+                        value={snapshot[factor.key]}
+                        onChange={(event) =>
+                          setSnapshot((current) => ({ ...current, [factor.key]: Number(event.target.value) }))
+                        }
+                        className="w-full accent-foreground"
+                      />
+                    </div>
+                  ))}
+                </div>
+              </Panel>
+
+              {signalTrends.length > 0 && (
+                <Panel className="p-5 lg:col-span-2">
+                  <div className="mb-4 flex items-center justify-between">
+                    <span className="font-mono text-xs uppercase tracking-[0.08em] text-muted-foreground">Category trends</span>
+                    <TrendingUp className="h-4 w-4 text-muted-foreground" />
+                  </div>
+                  <div className="h-56">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <BarChart data={signalTrends}>
+                        <CartesianGrid strokeDasharray="3 3" stroke="rgba(0,0,0,0.08)" />
+                        <XAxis dataKey="label" tickLine={false} axisLine={false} fontSize={11} />
+                        <YAxis domain={[0, 100]} tickLine={false} axisLine={false} fontSize={12} />
+                        <Tooltip />
+                        <Bar dataKey="previous" fill="rgba(0,0,0,0.18)" />
+                        <Bar dataKey="value" fill="currentColor" />
+                      </BarChart>
+                    </ResponsiveContainer>
+                  </div>
+                </Panel>
+              )}
+            </div>
+          </div>
+        )}
+
+        {activeTab === "marketplace" && (
+          <div className="space-y-6">
+            <PageHeader
+              label="Marketplace"
+              title="Borrow from live pools"
+              detail="Choose a pool, check score fit, and draw liquidity."
+              actions={
+                <Panel className="flex flex-col gap-3 p-3 sm:flex-row sm:items-end">
+                  <SelectField label="Pool" value={borrowForm.poolId} onChange={(poolId) => setBorrowForm((current) => ({ ...current, poolId }))}>
+                    {pools.map((pool) => (
+                      <option key={pool.id} value={pool.id}>
+                        Pool {pool.id}
+                      </option>
+                    ))}
+                  </SelectField>
+                  <TextInput label="Amount" value={borrowForm.amount} onChange={(amount) => setBorrowForm((current) => ({ ...current, amount }))} suffix={assetSymbol(selectedPool)} />
+                  <ActionButton onClick={borrow} disabled={busy || (hasContract && !account) || scoreStale || !selectedPool || profile.publicScore < (selectedPool?.minScore || 0)}>
+                    Borrow <ArrowRight className="h-4 w-4" />
+                  </ActionButton>
+                </Panel>
+              }
+            />
+
+            {scoreStale && <p className="text-sm text-muted-foreground">Refresh your score before borrowing again.</p>}
+
+            <div className="grid gap-4 lg:grid-cols-3">
+              {pools.length === 0 && (
+                <Panel className="p-6 text-sm leading-relaxed text-muted-foreground lg:col-span-3">
+                  No live pools are available from the configured contract yet.
+                </Panel>
+              )}
+              {pools.map((pool) => {
+                const qualifies = profile.publicScore >= pool.minScore;
+                return (
+                  <Panel key={pool.id} className="p-5">
+                    <div className="mb-5 flex items-center justify-between gap-4">
+                      <span className="font-mono text-xs uppercase tracking-[0.08em] text-muted-foreground">Pool {pool.id}</span>
+                      <span className={cn("rounded-md border px-2.5 py-1 text-xs font-mono uppercase", qualifies ? "border-emerald-500/25 text-emerald-700" : "border-foreground/10 text-muted-foreground")}>
+                        {qualifies ? "Qualified" : "Gated"}
+                      </span>
+                    </div>
+                    <div className="font-display text-4xl leading-none">{formatAssetAmount(pool, pool.liquidity)}</div>
+                    <div className="mt-6 grid grid-cols-2 gap-x-5 gap-y-3 text-sm">
+                      <span className="text-muted-foreground">Asset</span>
+                      <span>{assetSymbol(pool)}</span>
+                      <span className="text-muted-foreground">Min score</span>
+                      <span>{pool.minScore}</span>
+                      <span className="text-muted-foreground">Interest</span>
+                      <span>{asPercent(pool.interestBps)}</span>
+                      <span className="text-muted-foreground">Max loan</span>
+                      <span>{formatAssetAmount(pool, pool.maxLoanAmount)}</span>
+                      <span className="text-muted-foreground">Collateral</span>
+                      <span>{asPercent(Math.min(pool.baseCollateralBps, collateralBpsForScore(profile.publicScore)))}</span>
+                    </div>
+                  </Panel>
+                );
+              })}
+            </div>
+
+            <Panel className="p-4 text-sm text-muted-foreground">
+              Required collateral: {formatEth(requiredCollateral)} at {asPercent(borrowCollateralBps)}.
+            </Panel>
+          </div>
+        )}
+
+        {false && (
+          <div>
             <div>
-              <SectionLabel>Encrypted score engine</SectionLabel>
-              <h2 className="mt-6 font-display text-5xl leading-none">Generate a verified score.</h2>
-              <p className="mt-6 text-lg leading-relaxed text-muted-foreground">
-                Wallet signals are encrypted through the trusted CoFHE attester flow, scored in the contract, and only the final score is published.
-              </p>
-              <div className="mt-8 border border-foreground/10 p-6">
-                <span className="text-xs font-mono uppercase text-muted-foreground">Projected score</span>
-                <div className="mt-3 font-display text-7xl">{projectedScore}</div>
-                <p className="mt-2 text-sm text-muted-foreground">Final score is verified by decrypt-for-transaction before publish.</p>
+              <div>
               </div>
             </div>
             <div className="space-y-6">
