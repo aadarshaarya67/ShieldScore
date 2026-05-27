@@ -1556,80 +1556,56 @@ export function ShieldScoreApp({ initialTab = "dashboard" }: { initialTab?: Shie
 
   return (
     <main className="min-h-screen bg-background text-foreground noise-overlay">
-      <header className="sticky top-0 z-40 border-b border-foreground/10 bg-background/85 backdrop-blur-xl">
-        <div className="relative mx-auto flex w-full max-w-[1400px] items-center justify-between gap-3 px-4 py-4 sm:px-6 lg:px-12">
-          <a href="/" className="shrink-0 font-display text-xl sm:text-2xl">
+      <header className="sticky top-0 z-40 border-b border-foreground/10 bg-background/[0.88] backdrop-blur-xl">
+        <div className="mx-auto flex w-full max-w-[1440px] flex-wrap items-center gap-3 px-4 py-3 sm:px-6 lg:px-10">
+          <a href="/" className="shrink-0 font-display text-2xl leading-none">
             ShieldScore
           </a>
-          <div className="hidden items-center gap-2 xl:flex">
+          <nav className="order-3 flex w-full gap-1 overflow-x-auto [scrollbar-width:none] lg:order-none lg:w-auto lg:flex-1 lg:justify-center [&::-webkit-scrollbar]:hidden">
             {tabs.map((tab) => (
               <a
                 key={tab.id}
                 href={tab.href}
                 className={cn(
-                  "inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm transition-colors",
-                  activeTab === tab.id ? "bg-foreground text-background" : "text-muted-foreground hover:bg-foreground/[0.04] hover:text-foreground"
+                  "inline-flex h-10 shrink-0 items-center gap-2 rounded-md px-3 text-sm font-medium transition-colors",
+                  activeTab === tab.id
+                    ? "bg-foreground text-background shadow-sm"
+                    : "text-muted-foreground hover:bg-foreground/[0.05] hover:text-foreground"
                 )}
               >
                 <tab.icon className="h-4 w-4" />
-                {tab.label}
+                <span className="whitespace-nowrap">{tab.label}</span>
               </a>
             ))}
-          </div>
-          <button
-            type="button"
-            onClick={connectWallet}
-            disabled={busy}
-            className="absolute right-4 top-3 inline-flex h-10 w-10 items-center justify-center rounded-full bg-foreground text-background transition-opacity disabled:pointer-events-none disabled:opacity-50 sm:hidden"
-          >
-            <Wallet className="h-4 w-4" />
-            <span className="sr-only">{account ? shorten(account) : "Connect wallet"}</span>
-          </button>
-          <div className="hidden min-w-0 shrink-0 items-center gap-3 sm:flex">
-            <span className="hidden text-xs font-mono text-muted-foreground 2xl:inline">
-              {hasContract ? `${shorten(SHIELDSCORE_ADDRESS)} / ${chainId}` : "demo"}
+          </nav>
+          <div className="ml-auto flex min-w-0 shrink-0 items-center gap-2">
+            <span className="hidden max-w-[180px] truncate rounded-md border border-foreground/10 bg-background/70 px-3 py-2 text-xs font-mono text-muted-foreground xl:inline-flex">
+              {hasContract ? `${shorten(SHIELDSCORE_ADDRESS)} / ${chainId}` : "Demo"}
             </span>
             <ActionButton onClick={connectWallet} disabled={busy} variant={account ? "outline" : "solid"}>
               <Wallet className="h-4 w-4" />
-              {account ? shorten(account) : "Connect"}
+              <span className="hidden sm:inline">{account ? shorten(account) : "Connect"}</span>
             </ActionButton>
           </div>
-        </div>
-        <div className="mx-auto flex w-full max-w-[1400px] gap-2 overflow-x-auto px-4 pb-4 [scrollbar-width:none] sm:px-6 xl:hidden [&::-webkit-scrollbar]:hidden">
-          {tabs.map((tab) => (
-            <a
-              key={tab.id}
-              href={tab.href}
-              className={cn(
-                "inline-flex shrink-0 items-center gap-2 rounded-full px-4 py-2 text-sm",
-                activeTab === tab.id ? "bg-foreground text-background" : "border border-foreground/10 text-muted-foreground"
-              )}
-            >
-              <tab.icon className="h-4 w-4" />
-              {tab.label}
-            </a>
-          ))}
         </div>
       </header>
 
       <section className="border-b border-foreground/10">
-        <div className="mx-auto grid w-full max-w-[1400px] gap-px bg-foreground/10 px-4 sm:px-6 lg:grid-cols-4 lg:px-12">
-          {[
-            { label: "Credit score", value: effectiveScore, sub: scoreTier },
-            { label: "Loan history", value: loans.length, sub: `${profile.loansRepaid} on-time / ${profile.loansRepaidLate} late` },
-            { label: "Pools live", value: pools.length, sub: `${pools.filter((pool) => !isNativePool(pool)).length} ERC-20 pools` },
-            { label: "Status", value: deploymentIssue ? "Attention" : busy ? "Pending" : "Ready", sub: deploymentIssue || status },
-          ].map((metric) => (
-            <div key={metric.label} className="bg-background px-6 py-8">
-              <span className="text-xs font-mono uppercase text-muted-foreground">{metric.label}</span>
-              <div className="mt-3 font-display text-4xl">{metric.value}</div>
-              <p className="mt-2 line-clamp-1 text-sm text-muted-foreground">{metric.sub}</p>
-            </div>
-          ))}
+        <div className="mx-auto w-full max-w-[1440px] px-4 py-3 sm:px-6 lg:px-10">
+          <div className="flex flex-wrap items-center gap-x-4 gap-y-1 rounded-lg border border-foreground/10 bg-background/70 px-3 py-2">
+            <StatusRailItem label="Score" value={effectiveScore || "Not live"} tone={effectiveScore ? "success" : "neutral"} />
+            <StatusRailItem label="Loans" value={loans.length} tone={activeLoans.length ? "warning" : "neutral"} />
+            <StatusRailItem label="Pools" value={pools.length} tone={pools.length ? "success" : "neutral"} />
+            <StatusRailItem
+              label="State"
+              value={deploymentIssue ? "Attention" : busy ? "Pending" : "Ready"}
+              tone={deploymentIssue || busy ? "warning" : "success"}
+            />
+          </div>
         </div>
       </section>
 
-      <section className="mx-auto w-full max-w-[1400px] px-4 py-10 sm:px-6 lg:px-12 lg:py-14">
+      <section className="mx-auto w-full max-w-[1440px] px-4 py-8 sm:px-6 lg:px-10 lg:py-10">
         {activeTab === "dashboard" && (
           <div className="space-y-8">
             {deploymentIssue && (
