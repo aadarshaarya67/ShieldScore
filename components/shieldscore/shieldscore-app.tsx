@@ -426,8 +426,8 @@ function attestationFromTuple(id: Bytes32, tuple: readonly unknown[]): ScoreAtte
 
 function SectionLabel({ children }: { children: React.ReactNode }) {
   return (
-    <span className="inline-flex items-center gap-3 text-xs font-mono uppercase text-muted-foreground">
-      <span className="h-px w-8 bg-foreground/30" />
+    <span className="inline-flex items-center gap-2 text-xs font-mono uppercase tracking-[0.08em] text-muted-foreground">
+      <span className="h-px w-6 bg-foreground/25" />
       {children}
     </span>
   );
@@ -456,10 +456,10 @@ function ActionButton({
       aria-label={ariaLabel}
       title={title}
       className={cn(
-        "inline-flex h-11 items-center justify-center gap-2 rounded-full px-5 text-sm transition-all disabled:pointer-events-none disabled:opacity-50",
+        "inline-flex h-10 items-center justify-center gap-2 rounded-md px-4 text-sm font-medium transition-all disabled:pointer-events-none disabled:opacity-50",
         variant === "solid"
-          ? "bg-foreground text-background hover:bg-foreground/90"
-          : "border border-foreground/15 text-foreground hover:border-foreground/40 hover:bg-foreground/[0.03]"
+          ? "bg-foreground text-background shadow-sm hover:bg-foreground/90"
+          : "border border-foreground/15 bg-background/70 text-foreground hover:border-foreground/35 hover:bg-foreground/[0.04]"
       )}
     >
       {children}
@@ -480,10 +480,10 @@ function ActionLink({
     <a
       href={href}
       className={cn(
-        "inline-flex h-11 items-center justify-center gap-2 rounded-full px-5 text-sm transition-all",
+        "inline-flex h-10 items-center justify-center gap-2 rounded-md px-4 text-sm font-medium transition-all",
         variant === "solid"
-          ? "bg-foreground text-background hover:bg-foreground/90"
-          : "border border-foreground/15 text-foreground hover:border-foreground/40 hover:bg-foreground/[0.03]"
+          ? "bg-foreground text-background shadow-sm hover:bg-foreground/90"
+          : "border border-foreground/15 bg-background/70 text-foreground hover:border-foreground/35 hover:bg-foreground/[0.04]"
       )}
     >
       {children}
@@ -506,8 +506,8 @@ function TextInput({
 }) {
   return (
     <label className="block">
-      <span className="mb-2 block text-xs font-mono uppercase text-muted-foreground">{label}</span>
-      <span className="flex h-12 items-center border border-foreground/10 bg-background px-4 focus-within:border-foreground/40">
+      <span className="mb-2 block text-xs font-mono uppercase tracking-[0.08em] text-muted-foreground">{label}</span>
+      <span className="flex h-11 items-center rounded-md border border-foreground/10 bg-background/85 px-3 focus-within:border-foreground/35 focus-within:bg-background">
         <input
           value={value}
           onChange={(event) => onChange(event.target.value)}
@@ -531,7 +531,7 @@ function DashboardBadge({
   return (
     <span
       className={cn(
-        "inline-flex items-center gap-2 border px-3 py-1.5 text-xs font-mono uppercase",
+        "inline-flex items-center gap-2 rounded-md border px-3 py-1.5 text-xs font-mono uppercase tracking-[0.08em]",
         tone === "success" && "border-emerald-500/30 bg-emerald-500/10 text-emerald-700",
         tone === "warning" && "border-amber-500/30 bg-amber-500/10 text-amber-700",
         tone === "neutral" && "border-foreground/10 bg-foreground/[0.03] text-muted-foreground"
@@ -554,12 +554,12 @@ function DashboardMetric({
   detail: string;
 }) {
   return (
-    <div className="border border-foreground/10 bg-background p-5">
+    <div className="rounded-lg border border-foreground/10 bg-background/80 p-4 shadow-[0_1px_0_rgba(0,0,0,0.03)]">
       <div className="flex items-start justify-between gap-4">
-        <span className="text-xs font-mono uppercase text-muted-foreground">{label}</span>
+        <span className="text-xs font-mono uppercase tracking-[0.08em] text-muted-foreground">{label}</span>
         <Icon className="h-4 w-4 shrink-0 text-muted-foreground" />
       </div>
-      <div className="mt-5 font-display text-4xl leading-none">{value}</div>
+      <div className="mt-4 font-display text-3xl leading-none sm:text-4xl">{value}</div>
       <p className="mt-2 line-clamp-2 text-sm leading-relaxed text-muted-foreground">{detail}</p>
     </div>
   );
@@ -582,10 +582,86 @@ function DashboardProgress({
         <span className="font-medium">{label}</span>
         <span className="font-mono text-xs text-muted-foreground">{clamped}%</span>
       </div>
-      <div className="mt-3 h-2 bg-foreground/10">
-        <div className="h-full bg-foreground" style={{ width: `${clamped}%` }} />
+      <div className="mt-3 h-2 overflow-hidden rounded-full bg-foreground/10">
+        <div className="h-full rounded-full bg-foreground" style={{ width: `${clamped}%` }} />
       </div>
       <p className="mt-2 text-xs leading-relaxed text-muted-foreground">{detail}</p>
+    </div>
+  );
+}
+
+function Panel({ children, className }: { children: React.ReactNode; className?: string }) {
+  return <div className={cn("rounded-lg border border-foreground/10 bg-background/82 shadow-[0_18px_60px_rgba(0,0,0,0.04)]", className)}>{children}</div>;
+}
+
+function PageHeader({
+  label,
+  title,
+  detail,
+  actions,
+}: {
+  label: string;
+  title: string;
+  detail?: string;
+  actions?: React.ReactNode;
+}) {
+  return (
+    <div className="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
+      <div className="min-w-0">
+        <SectionLabel>{label}</SectionLabel>
+        <h1 className="mt-4 max-w-4xl text-balance font-display text-4xl leading-none sm:text-5xl lg:text-6xl">{title}</h1>
+        {detail && <p className="mt-4 max-w-2xl text-base leading-relaxed text-muted-foreground">{detail}</p>}
+      </div>
+      {actions && <div className="flex shrink-0 flex-wrap items-end gap-3">{actions}</div>}
+    </div>
+  );
+}
+
+function SelectField({
+  label,
+  value,
+  onChange,
+  children,
+}: {
+  label: string;
+  value: string;
+  onChange: (value: string) => void;
+  children: React.ReactNode;
+}) {
+  return (
+    <label className="block">
+      <span className="mb-2 block text-xs font-mono uppercase tracking-[0.08em] text-muted-foreground">{label}</span>
+      <select
+        value={value}
+        onChange={(event) => onChange(event.target.value)}
+        className="h-10 w-full rounded-md border border-foreground/10 bg-background/85 px-3 text-sm outline-none transition-colors focus:border-foreground/35"
+      >
+        {children}
+      </select>
+    </label>
+  );
+}
+
+function StatusRailItem({
+  label,
+  value,
+  tone = "neutral",
+}: {
+  label: string;
+  value: React.ReactNode;
+  tone?: "neutral" | "success" | "warning";
+}) {
+  return (
+    <div className="flex min-w-0 items-center gap-2 rounded-md px-2 py-1.5">
+      <span
+        className={cn(
+          "h-2 w-2 shrink-0 rounded-full bg-foreground/35",
+          tone === "success" && "bg-emerald-600",
+          tone === "warning" && "bg-amber-600"
+        )}
+      />
+      <span className="text-xs font-mono uppercase tracking-[0.08em] text-muted-foreground">{label}</span>
+      <span className="truncate text-sm font-medium">{value}</span>
     </div>
   );
 }
