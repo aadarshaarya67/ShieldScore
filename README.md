@@ -208,3 +208,4 @@ Wave 5 is now implemented as the production-hardening release:
 - The app is wired for Sepolia testnet. Production deployments must set `CREDIT_ATTESTER_PRIVATE_KEY` as a server-only environment variable matching the deployed contract's `creditAttester()`.
 - `npm audit --omit=dev` still reports Hardhat 2 transitive advisories because the latest `@cofhe/sdk` peers into the Hardhat 2 toolchain. Do not force Hardhat 3 without validating CoFHE plugin compatibility.
 - Webpack reports circular chunk warnings from CoFHE SDK bundling; the production build still completes and deploys successfully.
+
