@@ -591,7 +591,7 @@ function DashboardProgress({
 }
 
 function Panel({ children, className }: { children: React.ReactNode; className?: string }) {
-  return <div className={cn("rounded-lg border border-foreground/10 bg-background/82 shadow-[0_18px_60px_rgba(0,0,0,0.04)]", className)}>{children}</div>;
+  return <div className={cn("rounded-lg border border-foreground/10 bg-background/[0.82] shadow-[0_18px_60px_rgba(0,0,0,0.04)]", className)}>{children}</div>;
 }
 
 function PageHeader({
