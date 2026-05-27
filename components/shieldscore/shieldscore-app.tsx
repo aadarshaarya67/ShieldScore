@@ -1964,124 +1964,110 @@ export function ShieldScoreApp({ initialTab = "dashboard" }: { initialTab?: Shie
         )}
 
         {activeTab === "create" && (
-          <div className="grid gap-12 lg:grid-cols-[0.8fr_1.2fr]">
-            <div>
-              <SectionLabel>Lender desk</SectionLabel>
-              <h2 className="mt-6 font-display text-5xl leading-none">Create a score-gated pool.</h2>
-              <p className="mt-6 text-lg text-muted-foreground">Liquidity, thresholds, term length, and collateral policy are written directly to the protocol.</p>
-            </div>
-            <div className="grid gap-5 md:grid-cols-2">
-              <label className="block">
-                <span className="mb-2 block text-xs font-mono uppercase text-muted-foreground">Asset</span>
-                <select
-                  value={poolForm.assetType}
-                  onChange={(event) => setPoolForm((current) => ({ ...current, assetType: event.target.value }))}
-                  className="h-12 w-full border border-foreground/10 bg-background px-4 text-sm outline-none"
-                >
+          <div className="space-y-6">
+            <PageHeader
+              label="Create pool"
+              title="Open a score-gated pool"
+              detail="Set the asset, score threshold, collateral, and liquidity."
+            />
+            <Panel className="p-5">
+              <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
+                <SelectField label="Asset" value={poolForm.assetType} onChange={(assetType) => setPoolForm((current) => ({ ...current, assetType }))}>
                   <option value="native">Native ETH</option>
                   <option value="erc20">ERC-20 / ssUSDC</option>
-                </select>
-              </label>
-              {poolForm.assetType === "erc20" && (
-                <TextInput
-                  label="Token"
-                  value={poolForm.tokenAddress}
-                  onChange={(tokenAddress) => setPoolForm((current) => ({ ...current, tokenAddress }))}
-                  disabled={Boolean(SHIELDSCORE_USDC_ADDRESS)}
-                />
-              )}
-              <TextInput label="Minimum score" value={poolForm.minScore} onChange={(minScore) => setPoolForm((current) => ({ ...current, minScore }))} />
-              <TextInput label="Collateral cap" value={poolForm.collateral} onChange={(collateral) => setPoolForm((current) => ({ ...current, collateral }))} suffix="%" />
-              <TextInput label="Interest APY" value={poolForm.interest} onChange={(interest) => setPoolForm((current) => ({ ...current, interest }))} suffix="%" />
-              <TextInput label="Duration" value={poolForm.duration} onChange={(duration) => setPoolForm((current) => ({ ...current, duration }))} suffix="days" />
-              {poolForm.assetType === "erc20" && (
-                <TextInput
-                  label="ETH price"
-                  value={poolForm.collateralPrice}
-                  onChange={(collateralPrice) => setPoolForm((current) => ({ ...current, collateralPrice }))}
-                  suffix="ETH/token"
-                  disabled={Boolean(SHIELDSCORE_USDC_ADDRESS)}
-                />
-              )}
-              <TextInput label="Max loan" value={poolForm.maxLoan} onChange={(maxLoan) => setPoolForm((current) => ({ ...current, maxLoan }))} suffix={poolForm.assetType === "native" ? "ETH" : "ssUSDC"} />
-              <TextInput label="Initial liquidity" value={poolForm.liquidity} onChange={(liquidity) => setPoolForm((current) => ({ ...current, liquidity }))} suffix={poolForm.assetType === "native" ? "ETH" : "ssUSDC"} />
-              <div className="md:col-span-2">
+                </SelectField>
+                {poolForm.assetType === "erc20" && (
+                  <TextInput
+                    label="Token"
+                    value={poolForm.tokenAddress}
+                    onChange={(tokenAddress) => setPoolForm((current) => ({ ...current, tokenAddress }))}
+                    disabled={Boolean(SHIELDSCORE_USDC_ADDRESS)}
+                  />
+                )}
+                <TextInput label="Minimum score" value={poolForm.minScore} onChange={(minScore) => setPoolForm((current) => ({ ...current, minScore }))} />
+                <TextInput label="Collateral cap" value={poolForm.collateral} onChange={(collateral) => setPoolForm((current) => ({ ...current, collateral }))} suffix="%" />
+                <TextInput label="Interest APY" value={poolForm.interest} onChange={(interest) => setPoolForm((current) => ({ ...current, interest }))} suffix="%" />
+                <TextInput label="Duration" value={poolForm.duration} onChange={(duration) => setPoolForm((current) => ({ ...current, duration }))} suffix="days" />
+                {poolForm.assetType === "erc20" && (
+                  <TextInput
+                    label="ETH price"
+                    value={poolForm.collateralPrice}
+                    onChange={(collateralPrice) => setPoolForm((current) => ({ ...current, collateralPrice }))}
+                    suffix="ETH/token"
+                    disabled={Boolean(SHIELDSCORE_USDC_ADDRESS)}
+                  />
+                )}
+                <TextInput label="Max loan" value={poolForm.maxLoan} onChange={(maxLoan) => setPoolForm((current) => ({ ...current, maxLoan }))} suffix={poolForm.assetType === "native" ? "ETH" : "ssUSDC"} />
+                <TextInput label="Initial liquidity" value={poolForm.liquidity} onChange={(liquidity) => setPoolForm((current) => ({ ...current, liquidity }))} suffix={poolForm.assetType === "native" ? "ETH" : "ssUSDC"} />
+              </div>
+              <div className="mt-6 flex flex-wrap gap-3">
                 <ActionButton onClick={createPool} disabled={busy || (hasContract && !account)}>
                   <Coins className="h-4 w-4" />
                   Create pool
                 </ActionButton>
                 {poolForm.assetType === "erc20" && SHIELDSCORE_USDC_ADDRESS && (
-                  <span className="ml-3 inline-flex">
-                    <ActionButton onClick={faucetUsdc} disabled={busy || (hasContract && !account)} variant="outline">
-                      <Banknote className="h-4 w-4" />
-                      Faucet
-                    </ActionButton>
-                  </span>
+                  <ActionButton onClick={faucetUsdc} disabled={busy || (hasContract && !account)} variant="outline">
+                    <Banknote className="h-4 w-4" />
+                    Faucet
+                  </ActionButton>
                 )}
               </div>
-            </div>
+            </Panel>
           </div>
         )}
 
         {activeTab === "repayments" && (
-          <div>
-            <div className="mb-10 flex flex-col justify-between gap-6 lg:flex-row lg:items-end">
-              <div>
-                <SectionLabel>Repayment tracker</SectionLabel>
-                <h2 className="mt-6 font-display text-5xl leading-none">Keep the score climbing.</h2>
-              </div>
-              <div className="flex flex-col gap-3 sm:flex-row sm:items-end">
-                <label>
-                  <span className="mb-2 block text-xs font-mono uppercase text-muted-foreground">Active loan</span>
-                  <select
-                    value={selectedLoanId}
-                    onChange={(event) => setSelectedLoanId(event.target.value)}
-                    className="h-11 border border-foreground/10 bg-background px-4 text-sm outline-none"
-                  >
+          <div className="space-y-6">
+            <PageHeader
+              label="Repayments"
+              title="Track every loan"
+              detail="Repay active loans and refresh credit after settlement."
+              actions={
+                <Panel className="flex flex-col gap-3 p-3 sm:flex-row sm:items-end">
+                  <SelectField label="Active loan" value={selectedLoanId} onChange={setSelectedLoanId}>
                     {activeLoans.map((loan) => (
                       <option key={loan.id} value={loan.id}>
                         Loan {loan.id}
                       </option>
                     ))}
-                  </select>
-                </label>
-                <ActionButton onClick={repay} disabled={busy || !selectedLoan}>
-                  Repay due
-                </ActionButton>
-                <ActionButton onClick={() => generateScore(true)} disabled={busy || profile.snapshotsSubmitted === 0} variant="outline">
-                  <RefreshCw className="h-4 w-4" />
-                  Refresh score
-                </ActionButton>
-              </div>
-            </div>
-            <div className="divide-y divide-foreground/10 border-y border-foreground/10">
-              {loans.length === 0 && <div className="py-10 text-muted-foreground">No borrower loans found.</div>}
+                  </SelectField>
+                  <ActionButton onClick={repay} disabled={busy || !selectedLoan}>Repay due</ActionButton>
+                  <ActionButton onClick={() => generateScore(true)} disabled={busy || profile.snapshotsSubmitted === 0} variant="outline">
+                    <RefreshCw className="h-4 w-4" />
+                    Refresh
+                  </ActionButton>
+                </Panel>
+              }
+            />
+
+            <Panel className="divide-y divide-foreground/10">
+              {loans.length === 0 && <div className="p-6 text-sm text-muted-foreground">No borrower loans found.</div>}
               {loans.map((loan) => {
                 const pool = pools.find((item) => item.id === loan.poolId);
                 return (
-                <div key={loan.id} className="grid gap-6 py-6 md:grid-cols-7 md:items-center">
+                <div key={loan.id} className="grid gap-5 p-5 md:grid-cols-7 md:items-center">
                   <div>
-                    <span className="text-xs font-mono text-muted-foreground">Loan</span>
+                    <span className="text-xs font-mono uppercase tracking-[0.08em] text-muted-foreground">Loan</span>
                     <div className="font-display text-3xl">#{loan.id}</div>
                   </div>
                   <div>
-                    <span className="text-xs font-mono text-muted-foreground">Asset</span>
+                    <span className="text-xs font-mono uppercase tracking-[0.08em] text-muted-foreground">Asset</span>
                     <div>{assetSymbol(pool)}</div>
                   </div>
                   <div>
-                    <span className="text-xs font-mono text-muted-foreground">Principal</span>
+                    <span className="text-xs font-mono uppercase tracking-[0.08em] text-muted-foreground">Principal</span>
                     <div>{formatAssetAmount(pool, loan.principal)}</div>
                   </div>
                   <div>
-                    <span className="text-xs font-mono text-muted-foreground">Interest</span>
+                    <span className="text-xs font-mono uppercase tracking-[0.08em] text-muted-foreground">Interest</span>
                     <div>{formatAssetAmount(pool, loan.interest, 6)}</div>
                   </div>
                   <div>
-                    <span className="text-xs font-mono text-muted-foreground">Collateral</span>
+                    <span className="text-xs font-mono uppercase tracking-[0.08em] text-muted-foreground">Collateral</span>
                     <div>{formatEth(loan.collateral)}</div>
                   </div>
                   <div>
-                    <span className="text-xs font-mono text-muted-foreground">Status</span>
+                    <span className="text-xs font-mono uppercase tracking-[0.08em] text-muted-foreground">Status</span>
                     <div>{["Active", "Repaid", "Defaulted"][loan.status]}</div>
                   </div>
                   <div className="flex justify-start md:justify-end">
@@ -2095,7 +2081,7 @@ export function ShieldScoreApp({ initialTab = "dashboard" }: { initialTab?: Shie
                 </div>
                 );
               })}
-            </div>
+            </Panel>
           </div>
         )}
 
