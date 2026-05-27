@@ -111,6 +111,102 @@
     animation: marquee-reverse 25s linear infinite;
   }
 
+  .hero-signal-stage {
+    height: clamp(5.5rem, 14vh, 8.5rem);
+    overflow: hidden;
+    pointer-events: none;
+    mask-image: linear-gradient(90deg, transparent, black 14%, black 86%, transparent);
+  }
+
+  .hero-signal-rail {
+    position: absolute;
+    inset: 0;
+    width: min(100%, 1180px);
+    margin-inline: auto;
+  }
+
+  .hero-signal-rail::before {
+    content: "";
+    position: absolute;
+    left: clamp(1.25rem, 4vw, 4rem);
+    right: clamp(1.25rem, 4vw, 4rem);
+    bottom: 2.6rem;
+    height: 1px;
+    background: linear-gradient(
+      90deg,
+      transparent,
+      color-mix(in oklch, var(--foreground) 24%, transparent),
+      transparent
+    );
+  }
+
+  .hero-signal-line {
+    position: absolute;
+    left: clamp(1rem, 4vw, 3.5rem);
+    right: clamp(1rem, 4vw, 3.5rem);
+    height: 1px;
+    background: repeating-linear-gradient(
+      90deg,
+      color-mix(in oklch, var(--foreground) 22%, transparent) 0 1px,
+      transparent 1px 28px
+    );
+    opacity: 0.45;
+    will-change: transform;
+  }
+
+  .hero-signal-line-a {
+    bottom: 3.45rem;
+    animation: hero-signal-drift 16s ease-in-out infinite alternate;
+  }
+
+  .hero-signal-line-b {
+    bottom: 1.75rem;
+    opacity: 0.28;
+    animation: hero-signal-drift 20s ease-in-out infinite alternate-reverse;
+  }
+
+  .hero-signal-sweep {
+    position: absolute;
+    bottom: 2.58rem;
+    width: clamp(5rem, 18vw, 15rem);
+    height: 1px;
+    background: linear-gradient(
+      90deg,
+      transparent,
+      color-mix(in oklch, var(--foreground) 58%, transparent),
+      transparent
+    );
+    opacity: 0;
+    will-change: transform, opacity;
+  }
+
+  .hero-signal-sweep-a {
+    animation: hero-signal-sweep 7.5s cubic-bezier(0.22, 1, 0.36, 1) infinite;
+  }
+
+  .hero-signal-sweep-b {
+    bottom: 3.45rem;
+    animation: hero-signal-sweep 9s cubic-bezier(0.22, 1, 0.36, 1) 2.8s infinite;
+  }
+
+  .hero-signal-node {
+    position: absolute;
+    bottom: 1.1rem;
+    width: 2px;
+    height: clamp(1.4rem, 5vh, 3rem);
+    background: color-mix(in oklch, var(--foreground) 45%, transparent);
+    opacity: 0.2;
+    transform-origin: bottom;
+    animation: hero-signal-node 4.8s ease-in-out infinite;
+    will-change: transform, opacity;
+  }
+
+  .hero-signal-node-a { left: 18%; animation-delay: 0s; }
+  .hero-signal-node-b { left: 34%; animation-delay: 0.8s; }
+  .hero-signal-node-c { left: 52%; animation-delay: 1.6s; }
+  .hero-signal-node-d { left: 68%; animation-delay: 2.4s; }
+  .hero-signal-node-e { left: 83%; animation-delay: 3.2s; }
+
   @keyframes marquee {
     0% { transform: translateX(0); }
     100% { transform: translateX(-50%); }
@@ -119,6 +215,63 @@
   @keyframes marquee-reverse {
     0% { transform: translateX(-50%); }
     100% { transform: translateX(0); }
+  }
+
+  @keyframes hero-signal-drift {
+    0% { transform: translateX(-1.75rem); }
+    100% { transform: translateX(1.75rem); }
+  }
+
+  @keyframes hero-signal-sweep {
+    0% {
+      opacity: 0;
+      transform: translateX(-35vw);
+    }
+    14% {
+      opacity: 0.75;
+    }
+    72% {
+      opacity: 0.75;
+    }
+    100% {
+      opacity: 0;
+      transform: translateX(110vw);
+    }
+  }
+
+  @keyframes hero-signal-node {
+    0%, 100% {
+      opacity: 0.16;
+      transform: scaleY(0.3);
+    }
+    45% {
+      opacity: 0.55;
+      transform: scaleY(1);
+    }
+  }
+
+  @media (max-width: 640px) {
+    .hero-signal-stage {
+      height: 5.5rem;
+    }
+
+    .hero-signal-node-d,
+    .hero-signal-node-e {
+      display: none;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .hero-signal-line,
+    .hero-signal-sweep,
+    .hero-signal-node {
+      animation: none;
+      transform: none;
+    }
+
+    .hero-signal-sweep {
+      opacity: 0.3;
+    }
   }
   
   .line-reveal {
