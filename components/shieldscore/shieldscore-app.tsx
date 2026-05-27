@@ -2152,79 +2152,64 @@ export function ShieldScoreApp({ initialTab = "dashboard" }: { initialTab?: Shie
         )}
 
         {activeTab === "risk" && (
-          <div>
-            <div className="mb-10 flex flex-col justify-between gap-6 lg:flex-row lg:items-end">
-              <div>
-                <SectionLabel>Lender risk</SectionLabel>
-                <h2 className="mt-6 font-display text-5xl leading-none">Pool health and controls.</h2>
-              </div>
-              <div className="grid gap-3 sm:grid-cols-2">
-                <div className="grid gap-3 sm:grid-cols-[120px_1fr_auto]">
-                  <label>
-                    <span className="mb-2 block text-xs font-mono uppercase text-muted-foreground">Pool</span>
-                    <select
-                      value={fundForm.poolId}
-                      onChange={(event) => setFundForm((current) => ({ ...current, poolId: event.target.value }))}
-                      className="h-12 w-full border border-foreground/10 bg-background px-4 text-sm outline-none"
-                    >
-                      {pools.map((pool) => (
-                        <option key={pool.id} value={pool.id}>
-                          {pool.id}
-                        </option>
-                      ))}
-                    </select>
-                  </label>
+          <div className="space-y-6">
+            <PageHeader
+              label="Risk"
+              title="Pool health and controls"
+              detail="Monitor lender exposure, utilization, defaults, and liquidity."
+            />
+
+            <Panel className="p-4">
+              <div className="grid gap-4 xl:grid-cols-2">
+                <div className="grid gap-3 sm:grid-cols-[120px_minmax(0,1fr)_auto] sm:items-end">
+                  <SelectField label="Pool" value={fundForm.poolId} onChange={(poolId) => setFundForm((current) => ({ ...current, poolId }))}>
+                    {pools.map((pool) => (
+                      <option key={pool.id} value={pool.id}>
+                        {pool.id}
+                      </option>
+                    ))}
+                  </SelectField>
                   <TextInput label="Fund pool" value={fundForm.amount} onChange={(amount) => setFundForm((current) => ({ ...current, amount }))} suffix={assetSymbol(selectedFundPool)} />
-                  <div className="self-end">
-                    <ActionButton
-                      onClick={fundPool}
-                      disabled={busy || !selectedFundPool || !isPoolLender(selectedFundPool)}
-                      ariaLabel="Fund selected pool"
-                      title="Fund selected pool"
-                    >
-                      <Banknote className="h-4 w-4" />
-                    </ActionButton>
-                  </div>
+                  <ActionButton
+                    onClick={fundPool}
+                    disabled={busy || !selectedFundPool || !isPoolLender(selectedFundPool)}
+                    ariaLabel="Fund selected pool"
+                    title="Fund selected pool"
+                  >
+                    <Banknote className="h-4 w-4" />
+                  </ActionButton>
                 </div>
-                <div className="grid gap-3 sm:grid-cols-[120px_1fr_auto]">
-                  <label>
-                    <span className="mb-2 block text-xs font-mono uppercase text-muted-foreground">Pool</span>
-                    <select
-                      value={withdrawForm.poolId}
-                      onChange={(event) => setWithdrawForm((current) => ({ ...current, poolId: event.target.value }))}
-                      className="h-12 w-full border border-foreground/10 bg-background px-4 text-sm outline-none"
-                    >
-                      {pools.map((pool) => (
-                        <option key={pool.id} value={pool.id}>
-                          {pool.id}
-                        </option>
-                      ))}
-                    </select>
-                  </label>
+                <div className="grid gap-3 sm:grid-cols-[120px_minmax(0,1fr)_auto] sm:items-end">
+                  <SelectField label="Pool" value={withdrawForm.poolId} onChange={(poolId) => setWithdrawForm((current) => ({ ...current, poolId }))}>
+                    {pools.map((pool) => (
+                      <option key={pool.id} value={pool.id}>
+                        {pool.id}
+                      </option>
+                    ))}
+                  </SelectField>
                   <TextInput label="Withdraw" value={withdrawForm.amount} onChange={(amount) => setWithdrawForm((current) => ({ ...current, amount }))} suffix={assetSymbol(selectedWithdrawPool)} />
-                  <div className="self-end">
-                    <ActionButton
-                      onClick={withdraw}
-                      disabled={busy || !selectedWithdrawPool || !isPoolLender(selectedWithdrawPool)}
-                      ariaLabel="Withdraw from selected pool"
-                      title="Withdraw from selected pool"
-                    >
-                      <ArrowRight className="h-4 w-4" />
-                    </ActionButton>
-                  </div>
+                  <ActionButton
+                    onClick={withdraw}
+                    disabled={busy || !selectedWithdrawPool || !isPoolLender(selectedWithdrawPool)}
+                    ariaLabel="Withdraw from selected pool"
+                    title="Withdraw from selected pool"
+                  >
+                    <ArrowRight className="h-4 w-4" />
+                  </ActionButton>
                 </div>
               </div>
-            </div>
-            <div className="grid gap-px bg-foreground/10 lg:grid-cols-3">
+            </Panel>
+
+            <div className="grid gap-4 lg:grid-cols-3">
               {pools.length === 0 && (
-                <div className="bg-background p-8 text-sm leading-relaxed text-muted-foreground lg:col-span-3">
+                <Panel className="p-6 text-sm leading-relaxed text-muted-foreground lg:col-span-3">
                   Pool controls will appear after the configured contract returns live pools.
-                </div>
+                </Panel>
               )}
               {pools.map((pool) => (
-                <div key={pool.id} className="bg-background p-6">
-                  <div className="mb-5 flex items-center justify-between">
-                    <span className="font-mono text-xs uppercase text-muted-foreground">Pool {pool.id}</span>
+                <Panel key={pool.id} className="p-5">
+                  <div className="mb-5 flex items-center justify-between gap-4">
+                    <span className="font-mono text-xs uppercase tracking-[0.08em] text-muted-foreground">Pool {pool.id}</span>
                     <button
                       type="button"
                       onClick={() => togglePool(pool)}
@@ -2235,7 +2220,7 @@ export function ShieldScoreApp({ initialTab = "dashboard" }: { initialTab?: Shie
                       {pool.active ? <Pause className="h-4 w-4" /> : <Play className="h-4 w-4" />}
                     </button>
                   </div>
-                  <div className="grid gap-4 text-sm">
+                  <div className="grid gap-3 text-sm">
                     <div className="flex justify-between gap-4">
                       <span className="text-muted-foreground">Asset</span>
                       <span>{assetSymbol(pool)}</span>
@@ -2276,13 +2261,13 @@ export function ShieldScoreApp({ initialTab = "dashboard" }: { initialTab?: Shie
                       </ActionButton>
                     </div>
                   )}
-                </div>
+                </Panel>
               ))}
             </div>
-            <div className="mt-10 grid gap-8 lg:grid-cols-2">
-              <div className="border border-foreground/10 p-5">
+            <div className="grid gap-6 lg:grid-cols-2">
+              <Panel className="p-5">
                 <div className="mb-5 flex items-center justify-between">
-                  <span className="font-mono text-xs uppercase text-muted-foreground">Cohort default curve</span>
+                  <span className="font-mono text-xs uppercase tracking-[0.08em] text-muted-foreground">Cohort default curve</span>
                   <BarChart3 className="h-4 w-4 text-muted-foreground" />
                 </div>
                 <div className="h-56">
@@ -2296,10 +2281,10 @@ export function ShieldScoreApp({ initialTab = "dashboard" }: { initialTab?: Shie
                     </BarChart>
                   </ResponsiveContainer>
                 </div>
-              </div>
-              <div className="border border-foreground/10 p-5">
+              </Panel>
+              <Panel className="p-5">
                 <div className="mb-5 flex items-center justify-between">
-                  <span className="font-mono text-xs uppercase text-muted-foreground">Pool event timeline</span>
+                  <span className="font-mono text-xs uppercase tracking-[0.08em] text-muted-foreground">Pool event timeline</span>
                   <Gauge className="h-4 w-4 text-muted-foreground" />
                 </div>
                 <div className="space-y-4">
@@ -2311,7 +2296,7 @@ export function ShieldScoreApp({ initialTab = "dashboard" }: { initialTab?: Shie
                   ))}
                   {indexedData.poolTimeline.length === 0 && <p className="text-sm text-muted-foreground">Pool events will appear after the indexer syncs.</p>}
                 </div>
-              </div>
+              </Panel>
             </div>
           </div>
         )}
