@@ -140,36 +140,25 @@ export function HeroSection() {
         
       </div>
       
-      {/* Stats marquee - full width outside container */}
+      {/* Decorative signal rail */}
       <div 
-        className={`absolute bottom-24 left-0 right-0 transition-all duration-700 delay-500 ${
+        aria-hidden="true"
+        className={`hero-signal-stage absolute inset-x-0 bottom-0 z-[1] transition-opacity duration-1000 delay-500 ${
           isVisible ? "opacity-100" : "opacity-0"
         }`}
       >
-        <div className="flex gap-16 marquee whitespace-nowrap">
-          {[...Array(2)].map((_, i) => (
-            <div key={i} className="flex gap-16">
-              {[
-                { value: "300-850", label: "verified score range", company: "COFHE" },
-                { value: "5 tiers", label: "collateral policy", company: "MARKET" },
-                { value: "0 raw", label: "data points revealed", company: "PRIVACY" },
-                { value: "24/7", label: "on-chain execution", company: "LENDING" },
-              ].map((stat) => (
-                <div key={`${stat.company}-${i}`} className="flex items-baseline gap-4">
-                  <span className="text-4xl lg:text-5xl font-display">{stat.value}</span>
-                  <span className="text-sm text-muted-foreground">
-                    {stat.label}
-                    <span className="block font-mono text-xs mt-1">{stat.company}</span>
-                  </span>
-                </div>
-              ))}
-            </div>
-          ))}
+        <div className="hero-signal-rail">
+          <span className="hero-signal-line hero-signal-line-a" />
+          <span className="hero-signal-line hero-signal-line-b" />
+          <span className="hero-signal-sweep hero-signal-sweep-a" />
+          <span className="hero-signal-sweep hero-signal-sweep-b" />
+          <span className="hero-signal-node hero-signal-node-a" />
+          <span className="hero-signal-node hero-signal-node-b" />
+          <span className="hero-signal-node hero-signal-node-c" />
+          <span className="hero-signal-node hero-signal-node-d" />
+          <span className="hero-signal-node hero-signal-node-e" />
         </div>
       </div>
-      
-      {/* Scroll indicator */}
-      
     </section>
   );
 }
