@@ -2086,55 +2086,67 @@ export function ShieldScoreApp({ initialTab = "dashboard" }: { initialTab?: Shie
         )}
 
         {activeTab === "attestations" && (
-          <div className="grid gap-12 lg:grid-cols-[0.8fr_1.2fr]">
-            <div>
-              <SectionLabel>Score attestation</SectionLabel>
-              <h2 className="mt-6 font-display text-5xl leading-none">Share a threshold proof.</h2>
-              <div className="mt-8 flex flex-col gap-4 sm:flex-row sm:items-end">
-                <TextInput label="Threshold" value={attestationThreshold} onChange={setAttestationThreshold} />
-                <ActionButton onClick={issueAttestation} disabled={busy || profile.publicScore < Number(attestationThreshold)}>
-                  <BadgeCheck className="h-4 w-4" />
-                  Issue
-                </ActionButton>
-              </div>
-              <div className="mt-10 space-y-4 border border-foreground/10 p-5">
-                <div className="flex items-center justify-between">
-                  <span className="font-mono text-xs uppercase text-muted-foreground">Verify by id</span>
-                  <Search className="h-4 w-4 text-muted-foreground" />
-                </div>
-                <TextInput label="Attestation id" value={verifyForm.id} onChange={(id) => setVerifyForm((current) => ({ ...current, id }))} />
-                <TextInput label="Owner" value={verifyForm.owner} onChange={(owner) => setVerifyForm((current) => ({ ...current, owner }))} />
-                <div className="flex flex-wrap items-end gap-3">
+          <div className="space-y-6">
+            <PageHeader
+              label="Attest"
+              title="Share threshold proof"
+              detail="Issue or verify score attestations without exposing raw credit data."
+            />
+            <div className="grid gap-6 lg:grid-cols-[380px_minmax(0,1fr)]">
+              <div className="space-y-6">
+                <Panel className="p-5">
+                  <div className="mb-5 flex items-center justify-between gap-4">
+                    <span className="font-mono text-xs uppercase tracking-[0.08em] text-muted-foreground">Issue</span>
+                    <BadgeCheck className="h-4 w-4 text-muted-foreground" />
+                  </div>
+                  <div className="flex flex-col gap-4 sm:flex-row sm:items-end lg:flex-col lg:items-stretch">
+                    <TextInput label="Threshold" value={attestationThreshold} onChange={setAttestationThreshold} />
+                    <ActionButton onClick={issueAttestation} disabled={busy || profile.publicScore < Number(attestationThreshold)}>
+                      <BadgeCheck className="h-4 w-4" />
+                      Issue
+                    </ActionButton>
+                  </div>
+                </Panel>
+
+                <Panel className="space-y-4 p-5">
+                  <div className="flex items-center justify-between">
+                    <span className="font-mono text-xs uppercase tracking-[0.08em] text-muted-foreground">Verify</span>
+                    <Search className="h-4 w-4 text-muted-foreground" />
+                  </div>
+                  <TextInput label="Attestation id" value={verifyForm.id} onChange={(id) => setVerifyForm((current) => ({ ...current, id }))} />
+                  <TextInput label="Owner" value={verifyForm.owner} onChange={(owner) => setVerifyForm((current) => ({ ...current, owner }))} />
                   <TextInput label="Threshold" value={verifyForm.threshold} onChange={(threshold) => setVerifyForm((current) => ({ ...current, threshold }))} />
-                  <ActionButton onClick={verifyAttestation} disabled={busy}>
-                    Verify
-                  </ActionButton>
-                  {verifyResult && <span className="pb-3 text-sm text-muted-foreground">{verifyResult}</span>}
-                </div>
+                  <div className="flex flex-wrap items-center gap-3">
+                    <ActionButton onClick={verifyAttestation} disabled={busy}>Verify</ActionButton>
+                    {verifyResult && <span className="text-sm font-medium text-muted-foreground">{verifyResult}</span>}
+                  </div>
+                </Panel>
               </div>
-            </div>
-            <div className="divide-y divide-foreground/10 border-y border-foreground/10">
-              {attestations.map((attestation) => (
-                <div key={attestation.id} className="grid gap-4 py-5 md:grid-cols-[1fr_auto] md:items-center">
-                  <div>
-                    <div className="font-mono text-xs text-muted-foreground">{attestation.id}</div>
-                    <div className="mt-2 text-sm">
-                      Score {attestation.scoreAtIssue} met threshold {attestation.threshold}
-                      {attestation.revoked ? " / revoked" : ""}
+
+              <Panel className="divide-y divide-foreground/10">
+                {attestations.length === 0 && <div className="p-6 text-sm text-muted-foreground">No attestations issued yet.</div>}
+                {attestations.map((attestation) => (
+                  <div key={attestation.id} className="grid gap-4 p-5 md:grid-cols-[minmax(0,1fr)_auto] md:items-center">
+                    <div className="min-w-0">
+                      <div className="truncate font-mono text-xs text-muted-foreground">{attestation.id}</div>
+                      <div className="mt-2 text-sm">
+                        Score {attestation.scoreAtIssue} met threshold {attestation.threshold}
+                        {attestation.revoked ? " / revoked" : ""}
+                      </div>
+                    </div>
+                    <div className="flex flex-wrap gap-2 md:justify-end">
+                      <ActionButton onClick={() => copyAttestation(attestation.id)} variant="outline">
+                        <Link2 className="h-4 w-4" />
+                        Share
+                      </ActionButton>
+                      <ActionButton onClick={() => revokeAttestation(attestation.id)} disabled={busy || attestation.revoked} variant="outline">
+                        <CircleAlert className="h-4 w-4" />
+                        Revoke
+                      </ActionButton>
                     </div>
                   </div>
-                  <div className="flex flex-wrap gap-2 md:justify-end">
-                    <ActionButton onClick={() => copyAttestation(attestation.id)} variant="outline">
-                      <Link2 className="h-4 w-4" />
-                      Share
-                    </ActionButton>
-                    <ActionButton onClick={() => revokeAttestation(attestation.id)} disabled={busy || attestation.revoked} variant="outline">
-                      <CircleAlert className="h-4 w-4" />
-                      Revoke
-                    </ActionButton>
-                  </div>
-                </div>
-              ))}
+                ))}
+              </Panel>
             </div>
           </div>
         )}
